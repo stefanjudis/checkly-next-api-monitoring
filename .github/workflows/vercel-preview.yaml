@@ -25,7 +25,7 @@ jobs:
         run: |
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
           echo "$(cat deployment-url.txt)"
-          echo "ENVIRONMENT_URL=$(cat deployment-url.txt)" >> GITHUB_OUTPUT
+          echo "ENVIRONMENT_URL=$(cat deployment-url.txt)" >> "$GITHUB_OUTPUT"
       - name: Test future Checkly API monitoring
         env:
           ENVIRONMENT_URL: ${{ steps.vercel-deploy.outputs.ENVIRONMENT_URL }}
