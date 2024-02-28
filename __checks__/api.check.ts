@@ -1,4 +1,4 @@
-import { ApiCheck } from "checkly/constructs"
+import { ApiCheck, CheckGroup } from "checkly/constructs"
 import { globSync } from "glob"
 
 function slugifyRoutePath(path: string) {
@@ -6,7 +6,7 @@ function slugifyRoutePath(path: string) {
 }
 
 function getPublicPath(path: string) {
-  return path.replace("/app", "").replace(/route\.[jt]s/, "")
+  return path.replace("app/", "").replace(/route\.[jt]s/, "")
 }
 
 async function importModule(path: string) {
@@ -30,6 +30,11 @@ const BASE_URL =
 
 export default async function createChecks() {
   try {
+    const group = new CheckGroup("checkly-next", {
+      name: "Checkly Next.js API Monitoring",
+      locations: ["us-east-1", "eu-west-1"],
+    })
+
     const allEndpointFiles = await getEndpointFiles()
     const allEndpoints = await Promise.all(
       allEndpointFiles.map((path) => importModule(path))
@@ -40,9 +45,10 @@ export default async function createChecks() {
       new ApiCheck(slugifyRoutePath(endpoint.path), {
         name: endpoint.path,
         request: {
-          url: `${BASE_URL}${getPublicPath(endpoint.path)}`,
+          url: `${BASE_URL}/${getPublicPath(endpoint.path)}`,
           method: "GET",
         },
+        group: group,
       })
     }
   } catch (error) {
