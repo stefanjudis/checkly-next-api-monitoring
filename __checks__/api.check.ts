@@ -5,6 +5,10 @@ function slugifyRoutePath(path: string) {
   return path.replace(/\//g, "-").replace(/\.[jt]s/, "")
 }
 
+function getPublicPath(path: string) {
+  return path.replace("/app", "").replace(/route\.[jt]s/, "")
+}
+
 async function importModule(path: string) {
   return import(`../${path}`).then((module) => {
     return {
@@ -36,7 +40,7 @@ export default async function createChecks() {
       new ApiCheck(slugifyRoutePath(endpoint.path), {
         name: endpoint.path,
         request: {
-          url: `${BASE_URL}${slugifyRoutePath(endpoint.path)}`,
+          url: `${BASE_URL}${getPublicPath(endpoint.path)}`,
           method: "GET",
         },
       })
