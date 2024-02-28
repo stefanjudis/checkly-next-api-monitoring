@@ -26,7 +26,7 @@ function getEndpointFiles() {
 
 const BASE_URL =
   process.env.ENVIRONMENT_URL ||
-  `https://checkly-next-api-monitoring.vercel.app/`
+  `https://checkly-next-api-monitoring.vercel.app`
 
 export default async function createChecks() {
   try {
