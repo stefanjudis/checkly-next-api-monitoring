@@ -2,6 +2,8 @@ name: Vercel Preview Deployment
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+  CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
 on:
   push:
     branches-ignore:
@@ -22,7 +24,8 @@ jobs:
         id: vercel-deploy
         run: |
           vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
-          echo "ENVIRONMENT_URL=$(cat deployment-url.txt)" >> GITHUB_OUTPUT
+          echo "$(cat deployment-url.txt)"
+          echo "ENVIRONMENT_URL=$(cat deployment-url.txt)" >> "$GITHUB_OUTPUT"
       - name: Test future Checkly API monitoring
         env:
           ENVIRONMENT_URL: ${{ steps.vercel-deploy.outputs.ENVIRONMENT_URL }}
