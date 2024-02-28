@@ -20,6 +20,10 @@ function getEndpointFiles() {
   })
 }
 
+const BASE_URL =
+  process.env.ENVIRONMENT_URL ||
+  `https://checkly-next-api-monitoring.vercel.app/`
+
 export default async function createChecks() {
   try {
     const allEndpointFiles = await getEndpointFiles()
@@ -32,7 +36,7 @@ export default async function createChecks() {
       new ApiCheck(slugifyRoutePath(endpoint.path), {
         name: endpoint.path,
         request: {
-          url: `https://www.stefanjudis.com`,
+          url: `${BASE_URL}${slugifyRoutePath(endpoint.path)}`,
           method: "GET",
         },
       })
