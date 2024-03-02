@@ -10,21 +10,32 @@ const BASE_URL =
   process.env.ENVIRONMENT_URL ||
   `https://checkly-next-api-monitoring.vercel.app`
 
-const group = new CheckGroup("checkly-next", {
-  name: "Checkly Next.js API Monitoring",
-  locations: ["us-east-1", "eu-west-1"],
-  frequency: Frequency.EVERY_1H,
-})
+export default async function createChecks() {
+  try {
+    const group = new CheckGroup("checkly-next", {
+      name: "Checkly Next.js API Monitoring",
+      locations: ["us-east-1", "eu-west-1"],
+      frequency: Frequency.EVERY_1H,
+    })
 
-new ApiCheck("items", {
-  name: "app/items/route.ts",
-  request: {
-    url: `${BASE_URL}/items/`,
-    method: "GET",
-    assertions: [AssertionBuilder.statusCode().equals(200)],
-  },
-  group: group,
-})
+    const endpoints = await getAllGetEndpoints()
+
+    for (const endpoint of endpoints) {
+      const { id, filePath, publicPath } = endpoint
+
+      new ApiCheck(id, {
+        name: filePath,
+        request: {
+          url: `${BASE_URL}/${publicPath}`,
+          method: "GET",
+        },
+        group: group,
+      })
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 // -----------------------------------------------------------------------------
 
