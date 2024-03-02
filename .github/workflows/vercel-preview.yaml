@@ -29,4 +29,6 @@ jobs:
       - name: Test future Checkly API monitoring
         env:
           ENVIRONMENT_URL: ${{ steps.vercel-deploy.outputs.ENVIRONMENT_URL }}
-        run: ENVIRONMENT_URL=$ENVIRONMENT_URL npx checkly test --record
+        run: |
+          echo "$ENVIRONMENT_URL"
+          ENVIRONMENT_URL=$ENVIRONMENT_URL npx checkly test --record
