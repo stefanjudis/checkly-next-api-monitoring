@@ -37,39 +37,29 @@ async function getAllGetEndpoints() {
   // map items to id, path and publicPath
   return getEndpoints.map(({ path, module }) => {
     return {
-      path,
-      id: slugifyRoutePath(path),
-      publicPath: getPublicPath(path),
+      filePath: path, // app/items/route.ts
+      id: slugifyRoutePath(path), // app-items-route
+      publicPath: getPublicPath(path), // items/
     }
   })
 }
+
+// -----------------------------------------------------------------------------
 
 const BASE_URL =
   process.env.ENVIRONMENT_URL ||
   `https://checkly-next-api-monitoring.vercel.app`
 
-export default async function createChecks() {
-  try {
-    const group = new CheckGroup("checkly-next", {
-      name: "Checkly Next.js API Monitoring",
-      locations: ["us-east-1", "eu-west-1"],
-    })
+const group = new CheckGroup("checkly-next", {
+  name: "Checkly Next.js API Monitoring",
+  locations: ["us-east-1", "eu-west-1"],
+})
 
-    const endpoints = await getAllGetEndpoints()
-
-    for (const endpoint of endpoints) {
-      const { path, id, publicPath } = endpoint
-
-      new ApiCheck(id, {
-        name: path,
-        request: {
-          url: `${BASE_URL}/${publicPath}`,
-          method: "GET",
-        },
-        group: group,
-      })
-    }
-  } catch (error) {
-    console.error(error)
-  }
-}
+new ApiCheck("items", {
+  name: "app/items/route.ts",
+  request: {
+    url: `${BASE_URL}/items/`,
+    method: "GET",
+  },
+  group: group,
+})
