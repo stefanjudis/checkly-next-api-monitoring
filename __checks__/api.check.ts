@@ -1,4 +1,9 @@
-import { ApiCheck, CheckGroup, Frequency } from "checkly/constructs"
+import {
+  ApiCheck,
+  AssertionBuilder,
+  CheckGroup,
+  Frequency,
+} from "checkly/constructs"
 import { globSync } from "glob"
 
 function slugifyRoutePath(path: string) {
@@ -61,6 +66,7 @@ new ApiCheck("items", {
   request: {
     url: `${BASE_URL}/items/`,
     method: "GET",
+    assertions: [AssertionBuilder.statusCode().equals(200)],
   },
   group: group,
 })
