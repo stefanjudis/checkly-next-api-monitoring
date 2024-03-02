@@ -1,4 +1,4 @@
-import { ApiCheck, CheckGroup } from "checkly/constructs"
+import { ApiCheck, CheckGroup, Frequency } from "checkly/constructs"
 import { globSync } from "glob"
 
 function slugifyRoutePath(path: string) {
@@ -53,6 +53,7 @@ const BASE_URL =
 const group = new CheckGroup("checkly-next", {
   name: "Checkly Next.js API Monitoring",
   locations: ["us-east-1", "eu-west-1"],
+  frequency: Frequency.EVERY_1H,
 })
 
 new ApiCheck("items", {

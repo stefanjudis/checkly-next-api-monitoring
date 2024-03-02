@@ -1,3 +1,3 @@
 export async function GET() {
-  return Response.json(['a car', 'a house'])
+  return Response.json(["a car", "a house"])
 }
