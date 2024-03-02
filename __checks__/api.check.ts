@@ -24,6 +24,26 @@ function getEndpointFiles() {
   })
 }
 
+async function getAllGetEndpoints() {
+  // read all `route.ts` files
+  const allEndpointFiles = await getEndpointFiles()
+  // import all `route.ts` exports
+  const allEndpoints = await Promise.all(
+    allEndpointFiles.map((path) => importModule(path))
+  )
+  // filter out all `GET` exports
+  const getEndpoints = allEndpoints.filter(({ module }) => !!module.GET)
+
+  // map items to id, path and publicPath
+  return getEndpoints.map(({ path, module }) => {
+    return {
+      path,
+      id: slugifyRoutePath(path),
+      publicPath: getPublicPath(path),
+    }
+  })
+}
+
 const BASE_URL =
   process.env.ENVIRONMENT_URL ||
   `https://checkly-next-api-monitoring.vercel.app`
@@ -35,17 +55,15 @@ export default async function createChecks() {
       locations: ["us-east-1", "eu-west-1"],
     })
 
-    const allEndpointFiles = await getEndpointFiles()
-    const allEndpoints = await Promise.all(
-      allEndpointFiles.map((path) => importModule(path))
-    )
-    const getEndpoints = allEndpoints.filter(({ module }) => !!module.GET)
+    const endpoints = await getAllGetEndpoints()
 
-    for (const endpoint of getEndpoints) {
-      new ApiCheck(slugifyRoutePath(endpoint.path), {
-        name: endpoint.path,
+    for (const endpoint of endpoints) {
+      const { path, id, publicPath } = endpoint
+
+      new ApiCheck(id, {
+        name: path,
         request: {
-          url: `${BASE_URL}/${getPublicPath(endpoint.path)}`,
+          url: `${BASE_URL}/${publicPath}`,
           method: "GET",
         },
         group: group,
