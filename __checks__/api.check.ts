@@ -28,6 +28,7 @@ export default async function createChecks() {
         request: {
           url: `${BASE_URL}/${publicPath}`,
           method: "GET",
+          assertions: [AssertionBuilder.statusCode().equals(200)],
         },
         group: group,
       })
